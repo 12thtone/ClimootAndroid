@@ -8,7 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +55,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private TextView cityCountry;
     private TextView weatherDescription;
 
+    WeatherAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +69,16 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         lowTemp = (TextView)findViewById(R.id.lowTemp);
         cityCountry = (TextView)findViewById(R.id.cityCountry);
         weatherDescription = (TextView)findViewById(R.id.weatherDescription);
+
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.content_weather_reports);
+
+        mAdapter = new WeatherAdapter(weatherReportList);
+
+        recyclerView.setAdapter(mAdapter);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        recyclerView.setLayoutManager(layoutManager);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
                 .enableAutoManage(this, this)
@@ -109,6 +126,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                 }
 
                 updateUI();
+                mAdapter.notifyDataSetChanged();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -197,6 +215,70 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                     Log.v("MY_MAPS", "Permission Denied");
                     Toast.makeText(this, "Please enable location so we can check your weather.", Toast.LENGTH_LONG).show();
                 }
+            }
+        }
+    }
+
+    public class WeatherAdapter extends RecyclerView.Adapter<WeatherReportViewHolder> {
+
+        private  ArrayList<DailyWeatherReport> mDailyWeatherReports;
+
+        public WeatherAdapter(ArrayList<DailyWeatherReport> dailyWeatherReports) {
+            mDailyWeatherReports = dailyWeatherReports;
+        }
+
+        @Override
+        public void onBindViewHolder(WeatherReportViewHolder holder, int position) {
+            DailyWeatherReport report = mDailyWeatherReports.get(position);
+            holder.updateUI(report);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mDailyWeatherReports.size();
+        }
+
+        @Override
+        public WeatherReportViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View card = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_weather, parent, false);
+            return new WeatherReportViewHolder(card);
+        }
+    }
+
+    public class WeatherReportViewHolder extends RecyclerView.ViewHolder {
+
+        private ImageView weatherIconList;
+        private TextView weatherDateList;
+        private TextView weatherDescriptionList;
+        private TextView tempHighList;
+        private TextView tempLowList;
+
+        public WeatherReportViewHolder(View itemView) {
+            super(itemView);
+
+            weatherIconList = (ImageView)itemView.findViewById(R.id.list_weather_icon);
+            weatherDateList = (TextView)itemView.findViewById(R.id.list_weather_day);
+            weatherDescriptionList = (TextView)itemView.findViewById(R.id.list_weather_description);
+            tempHighList = (TextView)itemView.findViewById(R.id.list_weather_temp_high);
+            tempLowList = (TextView)itemView.findViewById(R.id.list_weather_temp_low);
+        }
+
+        public void updateUI(DailyWeatherReport report) {
+
+            weatherDateList.setText(report.getFormattedDate());
+            weatherDescriptionList.setText(report.getWeather());
+            tempHighList.setText(Integer.toString(report.getMaxTemp()));
+            tempLowList.setText(Integer.toString(report.getMinTemp()));
+
+            switch (report.getWeather()) {
+                case DailyWeatherReport.WEATHER_TYPE_CLOUDS:
+                    weatherIconList.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_mini));
+                    break;
+                case DailyWeatherReport.WEATHER_TYPE_RAIN:
+                    weatherIconList.setImageDrawable(getResources().getDrawable(R.drawable.rainy_mini));
+                    break;
+                default:
+                    weatherIconList.setImageDrawable(getResources().getDrawable(R.drawable.sunny_mini));
             }
         }
     }
