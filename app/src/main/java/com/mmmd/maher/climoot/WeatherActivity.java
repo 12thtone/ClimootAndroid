@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,8 +23,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.mmmd.maher.climoot.model.DailyWeatherReport;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
@@ -33,11 +40,28 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
     private GoogleApiClient mGoogleApiClient;
     private final int PERMISSION_LOCATION = 123;
+    private ArrayList<DailyWeatherReport> weatherReportList = new ArrayList<>();
+
+    private ImageView weatherIcon;
+    private ImageView weatherIconSmall;
+    private TextView weatherDate;
+    private TextView currentTemp;
+    private TextView lowTemp;
+    private TextView cityCountry;
+    private TextView weatherDescription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        weatherIcon = (ImageView)findViewById(R.id.weatherIcon);
+        weatherIconSmall = (ImageView)findViewById(R.id.weatherIconSmall);
+        weatherDate = (TextView)findViewById(R.id.weatherDate);
+        currentTemp = (TextView)findViewById(R.id.currentTemp);
+        lowTemp = (TextView)findViewById(R.id.lowTemp);
+        cityCountry = (TextView)findViewById(R.id.cityCountry);
+        weatherDescription = (TextView)findViewById(R.id.weatherDescription);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
                 .enableAutoManage(this, this)
@@ -54,6 +78,37 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void onResponse(JSONObject response) {
                 Log.v("CLIM", "Resp: " + response.toString());
+
+                try {
+                    JSONObject city = response.getJSONObject("city");
+                    String cityName = city.getString("name");
+                    String country = city.getString("country");
+                    Log.v("CLIM", "Nem: " + cityName + " - Country: " + country);
+
+                    JSONArray list = response.getJSONArray("list");
+                    for (int x = 0; x < 5; x++) {
+                        JSONObject obj = list.getJSONObject(x);
+                        JSONObject main = obj.getJSONObject("main");
+                        Double currentTemp = main.getDouble("temp");
+                        Double maxTemp = main.getDouble("temp_max");
+                        Double minTemp = main.getDouble("temp_min");
+                        int humidity = main.getInt("humidity");
+
+                        JSONArray weatherArray = obj.getJSONArray("weather");
+                        JSONObject weather = weatherArray.getJSONObject(0);
+                        String weatherType = weather.getString("main");
+
+                        String rawDate = obj.getString("dt_txt");
+
+                        DailyWeatherReport report = new DailyWeatherReport(cityName, country, currentTemp.intValue(), maxTemp.intValue(), minTemp.intValue(), weatherType, humidity, rawDate);
+                        Log.v("JSON", "Weather from class: " + report.getWeather());
+                        weatherReportList.add(report);
+                    }
+                } catch (JSONException e) {
+                    Log.v("CLIM", "Exep: " + e.getLocalizedMessage());
+                }
+
+                updateUI();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -63,6 +118,29 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         });
 
         Volley.newRequestQueue(this).add(jsonRequest);
+    }
+
+    public void updateUI() {
+        if (weatherReportList.size() > 0) {
+            DailyWeatherReport report = weatherReportList.get(0);
+
+            switch (report.getWeather()) {
+                case DailyWeatherReport.WEATHER_TYPE_CLOUDS:
+                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.cloudy));
+                    break;
+                case DailyWeatherReport.WEATHER_TYPE_RAIN:
+                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.rainy));
+                    break;
+                default:
+                    weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.sunny));
+            }
+
+            weatherDate.setText("I need code.");
+            currentTemp.setText(Integer.toString(report.getCurrentTemp()));
+            lowTemp.setText(Integer.toString(report.getMinTemp()));
+            cityCountry.setText(report.getCityName() + ", " + report.getCountry());
+            weatherDescription.setText(report.getWeather());
+        }
     }
 
     @Override
