@@ -1,5 +1,9 @@
 package com.mmmd.maher.climoot.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by maher on 7/3/16.
  */
@@ -16,55 +20,77 @@ public class DailyWeatherReport {
     private String country;
     private int currentTemp;
     private int maxTemp;
-    private int minTemp;
     private String weather;
     private int humidity;
     private String formattedDate;
 
-    public DailyWeatherReport(String cityName, String country, int currentTemp, int maxTemp, int minTemp, String weather, int humidity, String formattedDate) {
+    public DailyWeatherReport(String cityName, String country, int currentTemp, int maxTemp, String weather, int humidity, String formattedDate) {
         this.cityName = cityName;
         this.country = country;
         this.currentTemp = currentTemp;
         this.maxTemp = maxTemp;
-        this.minTemp = minTemp;
         this.weather = weather;
         this.humidity = humidity;
         this.formattedDate = rawDateToPretty(formattedDate);
     }
 
     public String rawDateToPretty(String rawDate) {
-        return "July 3";
+
+        String theDate = rawDate;
+
+        DateFormat oldFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date date = null;
+
+        try {
+            date = oldFormat.parse(theDate);
+        } catch (Exception e) {
+            date = null;
+        }
+
+        DateFormat newFormat = new SimpleDateFormat("MM/dd @ hh:mm");
+
+        if (date == null) {
+            theDate = newFormat.format(rawDate);
+        } else {
+            theDate = newFormat.format(date);
+        }
+
+        return theDate;
+//        return rawDate;
     }
 
     public String getCityName() {
+
         return cityName;
     }
 
     public String getCountry() {
+
         return country;
     }
 
     public int getCurrentTemp() {
+
         return currentTemp;
     }
 
     public int getMaxTemp() {
+
         return maxTemp;
     }
 
-    public int getMinTemp() {
-        return minTemp;
-    }
-
     public String getWeather() {
+
         return weather;
     }
 
     public int getHumidity() {
+
         return humidity;
     }
 
     public String getFormattedDate() {
+
         return formattedDate;
     }
 }

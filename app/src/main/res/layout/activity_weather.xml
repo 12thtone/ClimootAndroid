@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.mmmd.maher.climoot.WeatherActivity"
-    android:background="#499eec"
+    android:background="#1976D2"
     android:orientation="vertical">
 
     <LinearLayout
@@ -26,7 +26,8 @@
             android:layout_height="wrap_content"
             android:text="@string/app_name"
             android:id="@+id/textView"
-            android:textSize="20dp"/>
+            android:textSize="20dp"
+            android:textColor="#ffffff" />
     </LinearLayout>
 
     <LinearLayout
@@ -41,62 +42,92 @@
             android:layout_height="wrap_content"
             android:text="Today, July 3"
             android:textSize="25dp"
-            android:id="@+id/weatherDate" />
+            android:id="@+id/weatherDate"
+            android:textColor="#ffffff" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="bottom">
+            android:gravity="center">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="100dp"
-                android:text="78°"
-                android:id="@+id/currentTemp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="100dp"
+                    android:text="78°"
+                    android:id="@+id/currentTemp"
+                    android:textColor="#ffffff" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="30dp"
-                android:text="64°"
-                android:id="@+id/lowTemp" />
+                android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:id="@+id/weatherIcon"
-                android:src="@drawable/sunny" />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="90dp"
+                    android:id="@+id/weatherIcon"
+                    android:src="@drawable/sunny" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CovingtonCovington, USA"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:id="@+id/cityCountry"
+                    android:gravity="center"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clear"
+                    android:textSize="20dp"
+                    android:id="@+id/weatherDescription"
+                    android:gravity="center"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Humidity: 93%"
+                    android:textSize="20dp"
+                    android:id="@+id/currentHumidity"
+                    android:gravity="center"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="3">
+            android:padding="10dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Covington, USA"
-                android:textSize="20dp"
-                android:layout_weight="2"
-                android:id="@+id/cityCountry" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Clear"
-                android:textSize="20dp"
-                android:layout_weight="1"
-                android:id="@+id/weatherDescription" />
+                android:text="Just terrible. Hot and Humid. Probably won't get any better. Stay inside and hide."
+                android:textSize="23dp"
+                android:id="@+id/currentNarrative"
+                android:textColor="#ffffff" />
         </LinearLayout>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
         android:id="@+id/content_weather_reports"></android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

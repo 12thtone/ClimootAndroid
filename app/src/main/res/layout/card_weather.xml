@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ECECEC">
+    card_view:cardBackgroundColor="#2196F3">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:text="Tomorrow"
-                android:textColor="#595959"
+                android:textColor="#ffffff"
                 android:id="@+id/list_weather_day"/>
 
             <TextView
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="15dp"
                 android:text="Clear"
-                android:textColor="#595959"
+                android:textColor="#ffffff"
                 android:id="@+id/list_weather_description"/>
 
         </LinearLayout>
@@ -54,16 +54,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:text="78°"
-                android:textColor="#595959"
+                android:textColor="#ffffff"
                 android:id="@+id/list_weather_temp_high"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15dp"
-                android:text="67°"
-                android:textColor="#595959"
-                android:id="@+id/list_weather_temp_low"/>
 
         </LinearLayout>
     </LinearLayout>

@@ -51,7 +51,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private ImageView weatherIconSmall;
     private TextView weatherDate;
     private TextView currentTemp;
-    private TextView lowTemp;
+    private TextView currentHumidity;
     private TextView cityCountry;
     private TextView weatherDescription;
 
@@ -66,7 +66,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         weatherIconSmall = (ImageView)findViewById(R.id.weatherIconSmall);
         weatherDate = (TextView)findViewById(R.id.weatherDate);
         currentTemp = (TextView)findViewById(R.id.currentTemp);
-        lowTemp = (TextView)findViewById(R.id.lowTemp);
+        currentHumidity = (TextView)findViewById(R.id.currentHumidity);
         cityCountry = (TextView)findViewById(R.id.cityCountry);
         weatherDescription = (TextView)findViewById(R.id.weatherDescription);
 
@@ -94,7 +94,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         final JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.v("CLIM", "Resp: " + response.toString());
+                Log.v("ALLOFIT", "Resp: " + response.toString());
 
                 try {
                     JSONObject city = response.getJSONObject("city");
@@ -108,7 +108,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                         JSONObject main = obj.getJSONObject("main");
                         Double currentTemp = main.getDouble("temp");
                         Double maxTemp = main.getDouble("temp_max");
-                        Double minTemp = main.getDouble("temp_min");
                         int humidity = main.getInt("humidity");
 
                         JSONArray weatherArray = obj.getJSONArray("weather");
@@ -117,7 +116,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
                         String rawDate = obj.getString("dt_txt");
 
-                        DailyWeatherReport report = new DailyWeatherReport(cityName, country, currentTemp.intValue(), maxTemp.intValue(), minTemp.intValue(), weatherType, humidity, rawDate);
+                        DailyWeatherReport report = new DailyWeatherReport(cityName, country, currentTemp.intValue(), maxTemp.intValue(), weatherType, humidity, rawDate);
                         Log.v("JSON", "Weather from class: " + report.getWeather());
                         weatherReportList.add(report);
                     }
@@ -153,10 +152,10 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                     weatherIcon.setImageDrawable(getResources().getDrawable(R.drawable.sunny));
             }
 
-            weatherDate.setText("I need code.");
-            currentTemp.setText(Integer.toString(report.getCurrentTemp()));
-            lowTemp.setText(Integer.toString(report.getMinTemp()));
+            weatherDate.setText("Right Now");
+            currentTemp.setText(Integer.toString(report.getCurrentTemp()) + "°");
             cityCountry.setText(report.getCityName() + ", " + report.getCountry());
+            currentHumidity.setText("Humidity: " + report.getHumidity() + "%");
             weatherDescription.setText(report.getWeather());
         }
     }
@@ -171,7 +170,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
 
-            Log.v("MY_MAPS", "Requestion Permissions");
+            Log.v("MY_MAPS", "Request Permissions");
         } else {
             Log.v("MY_MAPS", "Starting Locations Services from onConnected");
             startLocationServices();
@@ -251,7 +250,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         private TextView weatherDateList;
         private TextView weatherDescriptionList;
         private TextView tempHighList;
-        private TextView tempLowList;
 
         public WeatherReportViewHolder(View itemView) {
             super(itemView);
@@ -260,15 +258,13 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             weatherDateList = (TextView)itemView.findViewById(R.id.list_weather_day);
             weatherDescriptionList = (TextView)itemView.findViewById(R.id.list_weather_description);
             tempHighList = (TextView)itemView.findViewById(R.id.list_weather_temp_high);
-            tempLowList = (TextView)itemView.findViewById(R.id.list_weather_temp_low);
         }
 
         public void updateUI(DailyWeatherReport report) {
 
             weatherDateList.setText(report.getFormattedDate());
             weatherDescriptionList.setText(report.getWeather());
-            tempHighList.setText(Integer.toString(report.getMaxTemp()));
-            tempLowList.setText(Integer.toString(report.getMinTemp()));
+            tempHighList.setText(Integer.toString(report.getCurrentTemp()) + "°");
 
             switch (report.getWeather()) {
                 case DailyWeatherReport.WEATHER_TYPE_CLOUDS:
